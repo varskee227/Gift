@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Our Little Quiz 💖</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #000000, #4b4b4b);
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .quiz-box {
+      background: #000000;
+      padding: 25px;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .quiz-box h2 {
+      color: #4e4e4e;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .quiz-box p {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #858585;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #b1b1b1;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #ffffff;
+    }
+
+    .emoji {
+      font-size: 28px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-box">
+    <div class="emoji">🌸💌</div>
+    <h2>Just One Sweet Question...</h2>
+    <p>What’s the one word that best describes *us*?</p>
+    <input type="text" id="answer" placeholder="Hint: starts with F" />
+    <button onclick="checkAnswer()">Tell Me 💬</button>
+  </div>
+
+  <script>
+    function checkAnswer() {
+      const userAnswer = document.getElementById('answer').value.trim().toLowerCase();
+      if (userAnswer === 'friendship' || userAnswer === 'forever') {
+        window.location.href = 'lo.html';
+      } else {
+        alert('Hmm... try thinking with your heart 🥺');
+      }
+    }
+  </script>
+
+</body>
+</html>

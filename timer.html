@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Birthday Countdown</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #4b4b4b, #181818, #24243e);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .image-container {
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(70, 70, 70, 0.5);
+      margin-bottom: 20px;
+    }
+
+    .image-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    h1 {
+      font-size: 2em;
+      text-align: center;
+      color: #ffd1dc;
+      margin-bottom: 10px;
+    }
+
+    .countdown {
+      font-size: 1.8em;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(133, 133, 133, 0.4);
+      margin: 20px 0;
+      backdrop-filter: blur(8px);
+      text-align: center;
+    }
+
+    .time-part {
+      display: inline-block;
+      margin: 5px 10px;
+    }
+
+    .greeting {
+      font-size: 1.2em;
+      color: #ffccff;
+      font-weight: bold;
+      text-align: center;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 10px #ffc0cb;
+      }
+      to {
+        text-shadow: 0 0 20px #7a7a7a, 0 0 30px #686868;
+      }
+    }
+
+    .urdu {
+      font-size: 1.1em;
+      color: #ffe6f2;
+      font-style: italic;
+      text-align: center;
+      font-family: 'Noto Nastaliq Urdu', serif;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 480px) {
+      .countdown {
+        font-size: 1.3em;
+        padding: 15px 20px;
+      }
+
+      h1 {
+        font-size: 1.5em;
+      }
+
+      .greeting {
+        font-size: 1em;
+      }
+
+      .urdu {
+        font-size: 1em;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🌸 Princess Image Here -->
+  <div class="image-container">
+    <img src="n.png" alt="Princess">
+  </div>
+
+  <h1>🌙 Countdown to Your Special Day, Princess 🌙</h1>
+
+  <div class="countdown" id="countdown">Loading...</div>
+
+  <div class="greeting">🎂 Advance Happy Birthday, My Moon Princess 🎂</div>
+
+  <div class="urdu">
+    شہزادی، تمہاری مسکراہٹ چاندنی کی طرح دل کو روشن کرتی ہے
+  </div>
+
+  <script>
+    const countdownElement = document.getElementById('countdown');
+    const targetDate = new Date('December 3, 2025 00:00:00').getTime();
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const gap = targetDate - now;
+
+      if (gap < 0) {
+        countdownElement.innerHTML = "🎉 It's your birthday, Princess!";
+        clearInterval(timer);
+        return;
+      }
+
+      const second = 1000;
+      const minute = second * 60;
+      const hour = minute * 60;
+      const day = hour * 24;
+
+      const d = Math.floor(gap / day);
+      const h = Math.floor((gap % day) / hour);
+      const m = Math.floor((gap % hour) / minute);
+      const s = Math.floor((gap % minute) / second);
+
+      countdownElement.innerHTML = `
+        <span class="time-part">${d} Days</span>
+        <span class="time-part">${h} Hours</span>
+        <span class="time-part">${m} Minutes</span>
+        <span class="time-part">${s} Seconds</span>
+      `;
+    }
+
+    const timer = setInterval(updateCountdown, 1000);
+    updateCountdown();
+  </script>
+</body>
+</html>

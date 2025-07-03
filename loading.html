@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Loading...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand&family=Pacifico&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #000000, #696969);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    .loader {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #c417f0;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    h2 {
+      font-family: 'Pacifico', cursive;
+      color: #c417f0;
+      font-size: 1.6rem;
+      text-align: center;
+    }
+
+    p {
+      color: #555;
+      font-size: 1rem;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 480px) {
+      h2 {
+        font-size: 1.4rem;
+      }
+      p {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loader"></div>
+  <h2>Preparing your journey...</h2>
+  <p>Soft dreams, starlit steps... just a moment 💫</p>
+
+  <script>
+    // Auto redirect after 3 seconds
+    setTimeout(() => {
+      window.location.href = 'moon.html'; // or page3.html
+    }, 3000);
+  </script>
+
+</body>
+</html>

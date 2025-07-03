@@ -1,0 +1,337 @@
+/* Basic Reset and Box Sizing */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Playfair Display', serif;
+    line-height: 1.6;
+    color: #eee; /* Light text on dark background */
+    background-color: #111; /* Dark background */
+    padding: 20px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Header Styles */
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 20px;
+    background-color: #222; /* Slightly lighter dark for contrast */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(255,255,255,0.05); /* Subtle white shadow */
+    border: 1px solid #333;
+}
+
+header h1 {
+    font-family: 'UnifrakturCook', cursive;
+    font-size: clamp(1.8em, 5vw, 3em);
+    color: #fff; /* White title */
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: clamp(1em, 2.5vw, 1.1em);
+    color: #ccc;
+}
+
+/* Main Grid Container */
+.image-grid-container {
+    display: grid;
+    gap: 20px; /* Space between grid items */
+    max-width: 1200px; /* Max width for the grid */
+    margin: 0 auto; /* Center the grid */
+    padding: 10px;
+}
+
+/* Responsive Grid Columns */
+/* Mobile (Default: 1 column) */
+.image-grid-container {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* More compact grid on small screens */
+}
+
+/* Tablet (2 columns) */
+@media (min-width: 600px) {
+    .image-grid-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Desktop (3 columns) */
+@media (min-width: 900px) {
+    .image-grid-container {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px; /* Restore larger gap on desktop */
+    }
+    /* Specific layout for the last rows on desktop, targeting elements by their data-index or class if not using nth-child */
+    .image-card[data-index="18"] { /* This is the 19th image: 2022.webp */
+        grid-column: 1; /* Start at column 1 */
+    }
+    .image-card[data-index="19"] { /* This is the 20th image: 2023.webp */
+        grid-column: 2; /* Start at column 2. This leaves column 3 empty in this row. */
+    }
+    .image-card[data-index="20"], .image-card[data-index="21"] { /* 21st and 22nd images: 2024.webp, 2025.webp */
+        grid-column: 1 / -1; /* Span across all columns */
+        width: calc(100% / 3 - 25px * 2 / 3); /* Make it approximately one-third width for centering */
+        margin: 0 auto; /* Center the item */
+    }
+}
+
+
+/* Individual Image Card Styles */
+.image-card {
+    background-color: #222; /* Dark card background */
+    border: 8px solid #333; /* Darker border */
+    border-radius: 8px;
+    overflow: hidden; /* Ensures image and overlay stay within bounds */
+    box-shadow: 0 6px 12px rgba(0,0,0,0.5); /* Soft shadow */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center content vertically in card */
+    text-align: center;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    cursor: pointer;
+    position: relative; /* For modal image positioning */
+    padding-bottom: 10px; /* Space for caption */
+}
+
+.image-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+    border-color: #eee; /* Highlight border on hover */
+}
+
+.image-card img {
+    max-width: 100%;
+    height: auto; /* Maintain aspect ratio */
+    display: block; /* Remove extra space below image */
+    border-radius: 3px; /* Slight roundness for the image itself */
+}
+
+.image-card .card-caption {
+    font-family: 'Playfair Display', serif; /* Use Playfair Display for readability for short caption */
+    font-style: italic;
+    font-size: clamp(0.9em, 2.2vw, 1em); /* Responsive font size */
+    color: #ccc;
+    padding: 10px 8px 3px; /* Top, horizontal, bottom padding */
+    line-height: 1.4;
+}
+
+.image-card .card-number {
+    font-weight: bold;
+    margin-right: 5px;
+    color: #eee;
+}
+
+
+/* Modal (Pop-up) Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+    display: flex; /* Use flexbox for centering */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    opacity: 0; /* Start hidden for transition */
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+.modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: #222; /* Dark modal background */
+    padding: 20px; /* Padding inside the modal content */
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    width: 90%; /* Responsive width */
+    max-width: 700px; /* Maximum width for desktop */
+    max-height: 95%; /* Responsive height, allow scrolling if content overflows */
+    overflow: hidden; /* Hide overflow of content, primarily for image-container content */
+    position: relative;
+    display: flex;
+    flex-direction: column; /* Stack image container and other potential elements */
+    align-items: center; /* Center items horizontally within modal */
+    animation: fadeInScale 0.3s forwards; /* Add an entry animation */
+}
+
+@keyframes fadeInScale {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+
+.close-button {
+    color: #eee;
+    font-size: 30px;
+    font-weight: bold;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    cursor: pointer;
+    transition: color 0.2s;
+    z-index: 1010; /* Ensure it's above other content */
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #fff;
+    text-decoration: none;
+}
+
+.modal-image-container {
+    position: relative; /* Crucial for absolute positioning of the overlay */
+    width: 100%; /* Take full width of modal-content */
+    max-height: 70vh; /* Limit image container height to allow modal-content to fit */
+    flex-grow: 1; /* Allows container to grow and take available space */
+    display: flex;
+    justify-content: center; /* Center image horizontally */
+    align-items: center; /* Center image vertically */
+    overflow: hidden; /* Hide any overflow, keeps overlay within bounds */
+    border-radius: 5px; /* Match image border-radius */
+}
+
+#modal-image {
+    max-width: 100%; /* Image scales within its container */
+    max-height: 100%; /* Image scales within its container, prevents overflow */
+    height: auto; /* Maintain aspect ratio */
+    width: auto; /* Maintain aspect ratio */
+    display: block;
+    object-fit: contain; /* Ensures image fits within bounds without cropping */
+}
+
+.modal-text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center horizontally and vertically */
+    background-color: rgba(0, 0, 0, 0.75); /* Translucent dark background for text */
+    color: #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 90%; /* Prevent text from hitting edges of the image */
+    max-height: 90%; /* Allow overlay to be scrollable if text is very long */
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content within the overlay */
+    align-items: center;
+    z-index: 2; /* Ensure overlay is above the image */
+    pointer-events: auto; /* Ensure text can be selected and scrolled */
+}
+
+#modal-short-caption {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1em, 2.5vw, 1.1em);
+    font-style: italic;
+    color: #ccc;
+    margin-bottom: 10px; /* Space between short and long description */
+    width: 100%;
+    flex-shrink: 0; /* Prevent from shrinking */
+}
+
+.modal-long-description-wrapper {
+    width: 100%;
+    /* No specific styling here, just a wrapper if needed for more complex layouts later */
+}
+
+#modal-long-description {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(0.9em, 2vw, 1em);
+    line-height: 1.6;
+    margin: 0; /* Remove default paragraph margin */
+    white-space: pre-wrap; /* Preserves line breaks from JS content */
+    font-style: italic;
+}
+
+
+/* Responsive adjustments for modal */
+@media (max-width: 768px) {
+    .modal-content {
+        padding: 15px;
+        max-width: 95%; /* Wider on smaller screens */
+        max-height: 95%; /* Adjust height for smaller screens */
+    }
+    .close-button {
+        font-size: 26px;
+        top: 10px;
+        right: 15px;
+    }
+    .modal-image-container {
+        max-height: 65vh; /* Adjust image container height on mobile */
+    }
+    .modal-text-overlay {
+        padding: 15px;
+        max-width: 95%; /* Adjust overlay width on mobile */
+        max-height: 90%; /* Adjust overlay height on mobile */
+    }
+    #modal-short-caption {
+        font-size: clamp(0.95em, 2.8vw, 1.1em);
+        margin-bottom: 8px;
+    }
+    #modal-long-description {
+        font-size: clamp(0.85em, 2.5vw, 1em);
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px; /* Reduced body padding on very small screens */
+    }
+    header {
+        padding: 15px;
+    }
+    .image-grid-container {
+        gap: 15px; /* Even smaller gap on tiny screens */
+    }
+    .image-card {
+        border-width: 5px; /* Thinner border for cards */
+        padding-bottom: 8px;
+    }
+    .modal-content {
+        padding: 10px;
+    }
+    .close-button {
+        font-size: 24px;
+        top: 8px;
+        right: 10px;
+    }
+    .modal-text-overlay {
+        padding: 10px;
+    }
+}
+#nextPageBtn {
+  background: linear-gradient(135deg, #ff4da6, #ff0066);
+  color: white;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+}
+
+#nextPageBtn:hover {
+  background: linear-gradient(135deg, #e60073, #cc0059);
+  transform: scale(1.05);
+}

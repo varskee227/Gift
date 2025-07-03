@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>For My Lovely Friend</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&family=Pacifico&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, #4b4b4b, #464646);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .gif-container {
+      width: 100%;
+      max-width: 280px;
+      margin-top: 20px;
+    }
+
+    .gif-container img {
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .input-container {
+      margin-top: 30px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 16px;
+      border: 2px solid #474747;
+      border-radius: 25px;
+      outline: none;
+      transition: 0.3s ease;
+    }
+
+    input:focus {
+      border-color: #2e2e2e;
+      box-shadow: 0 0 10px #555555;
+    }
+
+    #container {
+      display: none;
+      margin-top: 30px;
+      padding: 20px;
+      background: rgb(129, 129, 129);
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      max-width: 480px;
+      width: 100%;
+      position: relative;
+    }
+
+    .heart {
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      width: 80px;
+      height: 80px;
+      background: url('https://cdn-icons-png.flaticon.com/512/833/833472.png') no-repeat center/contain;
+      opacity: 0.2;
+      transform: rotate(15deg);
+    }
+
+    .typing-text {
+      white-space: pre-wrap; /* allows line breaks */
+      color: #333;
+      font-size: 1.1rem;
+      font-style: italic;
+      line-height: 1.6;
+      min-height: 150px;
+    }
+
+    #nextBtn {
+      display: none;
+      margin-top: 20px;
+      padding: 10px 25px;
+      border: none;
+      background: #727272;
+      color: white;
+      font-size: 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    #nextBtn:hover {
+      background-color: #252525;
+    }
+
+    @media (max-width: 500px) {
+      .gif-container {
+        max-width: 220px;
+      }
+
+      .typing-text {
+        font-size: 1rem;
+      }
+
+      input {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- GIF Section -->
+  <div class="gif-container">
+    <img src="n.png" alt="Friendship GIF">
+  </div>
+
+  <!-- Input Box -->
+  <div class="input-container">
+    <input type="text" id="inputBox" placeholder="Type 'ambrin' to reveal the message 💖">
+  </div>
+
+  <!-- Hidden Container -->
+  <div id="container">
+    <div class="heart"></div>
+    <p id="animatedText" class="typing-text"></p>
+    <button id="nextBtn" onclick="goNext()">Next ➜</button>
+  </div>
+
+  <script>
+    const inputBox = document.getElementById('inputBox');
+    const container = document.getElementById('container');
+    const animatedText = document.getElementById('animatedText');
+    const nextBtn = document.getElementById('nextBtn');
+
+    const poem = `💌Ambrin is not just a name — she's a season between twilight and wonder. Where moonlight lingers longer just to rest in her silence. Where stars don’t twinkle, they listen — for even constellations pause when her soul begins to speak."`;
+
+    function typeText(text, element, delay = 30, callback) {
+      let i = 0;
+      element.textContent = "";
+      const interval = setInterval(() => {
+        element.textContent += text.charAt(i);
+        i++;
+        if (i >= text.length) {
+          clearInterval(interval);
+          if (callback) callback(); // Show next button
+        }
+      }, delay);
+    }
+
+    inputBox.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        const value = inputBox.value.trim().toLowerCase();
+        if (value === 'ambrin') {
+          container.style.display = 'block';
+          animatedText.textContent = '';
+          nextBtn.style.display = 'none';
+          typeText(poem, animatedText, 30, () => {
+            nextBtn.style.display = 'inline-block';
+          });
+        } else {
+          container.style.display = 'none';
+          animatedText.textContent = '';
+          nextBtn.style.display = 'none';
+        }
+      }
+    });
+
+    function goNext() {
+      window.location.href = 'page2.html'; // Change this to your next page
+    }
+
+    // Autofocus input on load
+    window.onload = () => inputBox.focus();
+  </script>
+
+</body>
+</html>
