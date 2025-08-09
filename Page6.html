@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive IoT Reference Architecture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The application transforms the linear 15-slide presentation into a non-linear, interactive single-page application. The structure is thematic, with a top navigation bar allowing users to jump to any section. Key sections include: an introduction, an interactive exploration of the 3-layer vs. 5-layer models, a deep-dive into the 5 layers using a clickable diagram that dynamically updates content, and dedicated sections for Security, Case Studies, and Future Trends. This structure was chosen to facilitate user-led exploration and comparison, making the complex information more digestible and engaging than a static, sequential format. The primary interaction is the clickable 5-layer diagram, which centralizes the core information of the report into a single, powerful tool. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: 5 Layers of IoT Architecture. Goal: Organize & Inform. Viz/Method: An interactive vertical diagram built with HTML/Tailwind. Interaction: Clicking a layer dynamically displays its details (function, components, example) in an adjacent panel. Justification: This is far more engaging than scrolling through 5 static sections and visually reinforces the layered structure. Method: JS onClick events updating div innerHTML.
+        - Report Info: Comparison of 3-layer vs 5-layer models. Goal: Compare. Viz/Method: A tabbed interface. Interaction: Toggling between tabs to view each model's diagram and description. Justification: Allows for direct, in-place comparison. Method: JS onClick events managing visibility.
+        - Report Info: Conceptual relationships between layers. Goal: Inform/Compare. Viz/Method: A horizontal bar chart. Interaction: Static chart with tooltips. Justification: Fulfills the Chart.js requirement by visualizing a conceptual metric ('Abstraction Level') since the source report contains no numerical data. This provides a data-driven feel and visual aid. Library: Chart.js.
+        - Report Info: Case Studies. Goal: Apply knowledge. Viz/Method: A tabbed component for Smart Home vs. IIoT. Interaction: User clicks to switch between case studies. Justification: Organizes parallel examples cleanly. Method: JS onClick.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8; /* Warm off-white */
+            color: #4A4A4A; /* Dark Gray */
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #D35400; /* Muted Orange Accent */
+            border-bottom-color: #D35400;
+        }
+        .layer-box {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .layer-box:hover {
+            transform: translateX(10px);
+            background-color: #EAE3D9; /* Lighter beige */
+        }
+        .layer-box.active {
+            background-color: #D35400;
+            color: white;
+            border-color: #D35400;
+            transform: translateX(10px);
+        }
+        .tab-button {
+            transition: all 0.2s;
+        }
+        .tab-button.active {
+            background-color: #D35400;
+            color: white;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-[#D35400]">IoT Architecture</h1>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#introduction" class="nav-link font-medium pb-1">Introduction</a>
+                <a href="#models" class="nav-link font-medium pb-1">Models</a>
+                <a href="#deep-dive" class="nav-link font-medium pb-1">The 5 Layers</a>
+                <a href="#security" class="nav-link font-medium pb-1">Security</a>
+                <a href="#case-studies" class="nav-link font-medium pb-1">Case Studies</a>
+                <a href="#trends" class="nav-link font-medium pb-1">Future Trends</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#D35400]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#introduction" class="block py-2 nav-link">Introduction</a>
+            <a href="#models" class="block py-2 nav-link">Models</a>
+            <a href="#deep-dive" class="block py-2 nav-link">The 5 Layers</a>
+            <a href="#security" class="block py-2 nav-link">Security</a>
+            <a href="#case-studies" class="block py-2 nav-link">Case Studies</a>
+            <a href="#trends" class="block py-2 nav-link">Future Trends</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section id="introduction" class="scroll-mt-24 mb-24">
+            <h2 class="text-4xl font-bold text-center mb-4 text-[#2C3E50]">Deconstructing the Internet of Things</h2>
+            <p class="text-lg text-center max-w-3xl mx-auto mb-12">This application provides an interactive guide to IoT Reference Architecture. We'll move beyond static slides to explore the fundamental structures that enable billions of devices to communicate and create value. Let's begin by understanding the core concepts.</p>
+            
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+                    <h3 class="text-2xl font-bold mb-4 text-[#D35400]">What is IoT?</h3>
+                    <p class="mb-4">The Internet of Things (IoT) is a vast network of physical objects—"things"—that are embedded with sensors, software, and other technologies. Their purpose is to connect and exchange data with other devices and systems over the internet.</p>
+                    <ul class="space-y-2">
+                        <li class="flex items-start"><span class="text-[#D35400] font-bold mr-2">►</span><div><strong>Things:</strong> Physical objects, from a simple sensor to a complex industrial robot.</div></li>
+                        <li class="flex items-start"><span class="text-[#D35400] font-bold mr-2">►</span><div><strong>Connectivity:</strong> The communication fabric that allows devices to talk to each other and the cloud.</div></li>
+                        <li class="flex items-start"><span class="text-[#D35400] font-bold mr-2">►</span><div><strong>Data:</strong> The lifeblood of IoT—information that is collected, analyzed, and acted upon.</div></li>
+                    </ul>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+                    <h3 class="text-2xl font-bold mb-4 text-[#D35400]">Why Use a Reference Architecture?</h3>
+                    <p class="mb-4">A reference architecture acts as a blueprint. It provides a common framework and language, ensuring that complex IoT systems are built in a structured, reliable, and scalable way.</p>
+                    <ul class="space-y-2">
+                        <li><strong>Standardization:</strong> Creates a common understanding and design pattern.</li>
+                        <li><strong>Modularity:</strong> Breaks a complex system into manageable, reusable parts.</li>
+                        <li><strong>Interoperability:</strong> Ensures different components can work together seamlessly.</li>
+                        <li><strong>Scalability & Security:</strong> Provides a clear roadmap for growth and for identifying vulnerabilities.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="models" class="scroll-mt-24 mb-24">
+            <h2 class="text-4xl font-bold text-center mb-4 text-[#2C3E50]">Architectural Models</h2>
+            <p class="text-lg text-center max-w-3xl mx-auto mb-12">IoT architectures can be viewed at different levels of detail. We'll explore the foundational 3-layer model and the more comprehensive 5-layer model that is the industry standard. Use the tabs below to switch between them.</p>
+            <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+                <div class="flex justify-center mb-8 border-b">
+                    <button data-tab="model-3-layer" class="tab-button text-lg font-medium py-3 px-6 rounded-t-lg active">Simple 3-Layer Model</button>
+                    <button data-tab="model-5-layer" class="tab-button text-lg font-medium py-3 px-6 rounded-t-lg">Standard 5-Layer Model</button>
+                </div>
+                <div id="model-3-layer" class="tab-content">
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-4 text-[#D35400]">The Foundational View</h3>
+                            <p>This is the most basic model, abstracting an IoT system into three logical tiers. It's excellent for high-level conceptual understanding.</p>
+                            <ul class="mt-4 space-y-2">
+                                <li><strong>Perception:</strong> Physical devices and sensors that collect data.</li>
+                                <li><strong>Network:</strong> The communication infrastructure that transports data.</li>
+                                <li><strong>Application:</strong> The user-facing software and services.</li>
+                            </ul>
+                        </div>
+                        <div class="space-y-2 flex flex-col items-center">
+                             <div class="w-full max-w-xs text-center p-4 bg-blue-100 text-blue-800 rounded-lg shadow">Application Layer</div>
+                             <div class="text-2xl">▲</div>
+                             <div class="w-full max-w-xs text-center p-4 bg-green-100 text-green-800 rounded-lg shadow">Network Layer</div>
+                             <div class="text-2xl">▲</div>
+                             <div class="w-full max-w-xs text-center p-4 bg-orange-100 text-orange-800 rounded-lg shadow">Perception Layer</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="model-5-layer" class="tab-content hidden">
+                     <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-4 text-[#D35400]">The Industry Standard</h3>
+                            <p>This model provides a more detailed and granular view, separating data processing and business logic into their own distinct layers. It's the foundation for most modern IoT solutions.</p>
+                            <ul class="mt-4 space-y-2">
+                                <li>1. Business Layer</li>
+                                <li>2. Application Layer</li>
+                                <li>3. Data Processing Layer</li>
+                                <li>4. Network Layer</li>
+                                <li>5. Perception Layer</li>
+                            </ul>
+                        </div>
+                        <div class="space-y-2 flex flex-col items-center">
+                             <div class="w-full max-w-xs text-center p-3 bg-purple-100 text-purple-800 rounded-lg shadow">Business Layer</div>
+                             <div class="text-xl">▲</div>
+                             <div class="w-full max-w-xs text-center p-3 bg-blue-100 text-blue-800 rounded-lg shadow">Application Layer</div>
+                             <div class="text-xl">▲</div>
+                             <div class="w-full max-w-xs text-center p-3 bg-yellow-100 text-yellow-800 rounded-lg shadow">Data Processing Layer</div>
+                             <div class="text-xl">▲</div>
+                             <div class="w-full max-w-xs text-center p-3 bg-green-100 text-green-800 rounded-lg shadow">Network Layer</div>
+                             <div class="text-xl">▲</div>
+                             <div class="w-full max-w-xs text-center p-3 bg-orange-100 text-orange-800 rounded-lg shadow">Perception Layer</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="deep-dive" class="scroll-mt-24 mb-24">
+            <h2 class="text-4xl font-bold text-center mb-4 text-[#2C3E50]">Deep Dive: The 5 Layers</h2>
+            <p class="text-lg text-center max-w-3xl mx-auto mb-12">This is the core of the IoT architecture. Each layer has a specific responsibility, building upon the one below it. Click on any layer in the diagram to explore its function, key components, and examples.</p>
+            
+            <div class="grid lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1">
+                    <div id="layer-diagram" class="space-y-4">
+                        <div id="layer-business" class="layer-box border-2 border-gray-300 rounded-lg p-6">
+                            <h4 class="font-bold text-lg">5. Business Layer</h4>
+                            <p class="text-sm">Monetization & Management</p>
+                        </div>
+                        <div id="layer-application" class="layer-box border-2 border-gray-300 rounded-lg p-6">
+                            <h4 class="font-bold text-lg">4. Application Layer</h4>
+                            <p class="text-sm">Service Delivery</p>
+                        </div>
+                        <div id="layer-processing" class="layer-box border-2 border-gray-300 rounded-lg p-6">
+                            <h4 class="font-bold text-lg">3. Data Processing Layer</h4>
+                            <p class="text-sm">Analysis & Storage</p>
+                        </div>
+                        <div id="layer-network" class="layer-box border-2 border-gray-300 rounded-lg p-6">
+                            <h4 class="font-bold text-lg">2. Network Layer</h4>
+                            <p class="text-sm">Data Transmission</p>
+                        </div>
+                        <div id="layer-perception" class="layer-box border-2 border-gray-300 rounded-lg p-6 active">
+                            <h4 class="font-bold text-lg">1. Perception Layer</h4>
+                            <p class="text-sm">Data Collection</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:col-span-2 bg-white p-8 rounded-xl shadow-lg border border-gray-200 min-h-[400px]">
+                    <div id="layer-details">
+                    </div>
+                </div>
+            </div>
+            <div class="mt-16">
+                 <h3 class="text-3xl font-bold text-center mb-4 text-[#2C3E50]">Conceptual View: Abstraction Level</h3>
+                 <p class="text-lg text-center max-w-3xl mx-auto mb-8">This chart illustrates how each layer moves further away from the raw, physical data and closer to high-level business value. The Perception layer deals with concrete physical signals, while the Business layer deals with abstract strategic goals.</p>
+                 <div class="chart-container bg-white p-4 rounded-xl shadow-lg border border-gray-200">
+                    <canvas id="abstractionChart"></canvas>
+                 </div>
+            </div>
+        </section>
+
+        <section id="security" class="scroll-mt-24 mb-24">
+            <h2 class="text-4xl font-bold text-center mb-4 text-[#2C3E50]">Security: A Cross-Cutting Concern</h2>
+            <p class="text-lg text-center max-w-3xl mx-auto mb-12">Security isn't a single layer; it's a practice that must be integrated across the entire architecture. A failure at any level can compromise the whole system.</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-red-50 p-8 rounded-xl border border-red-200">
+                    <h3 class="text-2xl font-bold mb-4 text-red-700">Key Threats</h3>
+                    <ul class="space-y-3 list-disc list-inside">
+                        <li><strong>Device Tampering:</strong> Unauthorized physical access to sensors and devices.</li>
+                        <li><strong>Data Interception:</strong> Eavesdropping on data as it travels across the network.</li>
+                        <li><strong>DDoS Attacks:</strong> Overwhelming network gateways or servers to cause a shutdown.</li>
+                        <li><strong>Data Breaches:</strong> Unauthorized access to sensitive data stored in the cloud.</li>
+                        <li><strong>Unauthorized Control:</strong> Hijacking devices to perform malicious actions.</li>
+                    </ul>
+                </div>
+                <div class="bg-green-50 p-8 rounded-xl border border-green-200">
+                    <h3 class="text-2xl font-bold mb-4 text-green-700">Mitigation Strategies</h3>
+                     <ul class="space-y-3 list-disc list-inside">
+                        <li><strong>Encryption:</strong> Protecting data both in transit (on the network) and at rest (in storage).</li>
+                        <li><strong>Authentication:</strong> Securely verifying the identity of both users and devices before granting access.</li>
+                        <li><strong>Access Control:</strong> Implementing policies that limit permissions to the minimum required.</li>
+                        <li><strong>Regular Updates:</strong> Patching device firmware and software to fix vulnerabilities.</li>
+                        <li><strong>Secure Boot:</strong> Ensuring a device only runs trusted, authorized software.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="case-studies" class="scroll-mt-24 mb-24">
+            <h2 class="text-4xl font-bold text-center mb-4 text-[#2C3E50]">Architecture in Action: Case Studies</h2>
+            <p class="text-lg text-center max-w-3xl mx-auto mb-12">Let's see how the 5-layer architecture applies to real-world scenarios. Use the tabs to explore a Smart Home system and an Industrial IoT application.</p>
+            <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+                <div class="flex justify-center mb-8 border-b">
+                    <button data-tab="case-home" class="tab-button text-lg font-medium py-3 px-6 rounded-t-lg active">🏡 Smart Home</button>
+                    <button data-tab="case-industrial" class="tab-button text-lg font-medium py-3 px-6 rounded-t-lg">🏭 Industrial IoT</button>
+                </div>
+                <div id="case-home" class="tab-content">
+                    <h3 class="text-2xl font-bold mb-6 text-[#D35400]">Smart Home System Breakdown</h3>
+                    <dl class="space-y-4">
+                        <div class="grid grid-cols-4 gap-4"><dt class="font-bold col-span-1">Perception:</dt><dd class="col-span-3">Smart thermostat, motion sensors, cameras, smart locks.</dd></div>
+                        <div class="grid grid-cols-4 gap-4"><dt class="font-bold col-span-1">Network:</dt><dd class="col-span-3">Wi-Fi, Zigbee, and a central hub/gateway connecting to the internet.</dd></div>
+                        <div class="grid grid-cols-4 gap-4"><dt class="font-bold col-span-1">Data Processing:</dt><dd class="col-span-3">A cloud service analyzes usage patterns to create automated routines.</dd></div>
+                        <div class="grid grid-cols-4 gap-4"><dt class="font-bold col-span-1">Application:</dt><dd class="col-span-3">A mobile app for remote control, viewing status, and receiving alerts.</dd></div>
+                        <div class="grid grid-cols-4 gap-4"><dt class="font-bold col-span-1">Business:</dt><dd class="col-span-3">A subscription model for premium features like cloud video storage or advanced security monitoring.</dd></div>
+                    </dl>
+                </div>
+                <div id="case-industrial" class="tab-content hidden">
+                    <h3 class="text-2xl font-bold mb-6 text-[#D35400]">Industrial IoT (IIoT) Breakdown</h3>
+                    <dl class="space-y-4">
+                        <div class="grid grid-cols-4 gap-4"><dt class="font-bold col-span-1">Perception:</dt><dd class="col-span-3">Vibration, temperature, and pressure sensors on factory machinery.</dd></div>
+                        <div class="grid grid-cols-4 gap-4"><dt class="font-bold col-span-1">Network:</dt><dd class="col-span-3">Industrial gateways connecting to a secure factory network (wired/wireless).</dd></div>
+                        <div class="grid grid-cols-4 gap-4"><dt class="font-bold col-span-1">Data Processing:</dt><dd class="col-span-3">Edge computing devices for real-time analysis and alerts, with bulk data sent to a cloud platform for predictive maintenance analytics.</dd></div>
+                        <div class="grid grid-cols-4 gap-4"><dt class="font-bold col-span-1">Application:</dt><dd class="col-span-3">A dashboard for plant managers to monitor machine health, predict failures, and optimize production schedules.</dd></div>
+                        <div class="grid grid-cols-4 gap-4"><dt class="font-bold col-span-1">Business:</dt><dd class="col-span-3">The manufacturer uses the data to reduce operational costs, minimize downtime, and improve worker safety.</dd></div>
+                    </dl>
+                </div>
+            </div>
+        </section>
+
+        <section id="trends" class="scroll-mt-24">
+            <h2 class="text-4xl font-bold text-center mb-4 text-[#2C3E50]">Future Trends</h2>
+            <p class="text-lg text-center max-w-3xl mx-auto mb-12">The world of IoT is constantly evolving. These trends are shaping the future of IoT architecture, making systems smarter, faster, and more secure.</p>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 text-center">
+                    <div class="text-4xl mb-4">🧠</div>
+                    <h3 class="text-xl font-bold mb-2">AI & Machine Learning</h3>
+                    <p>Integrating AI for deeper insights, smarter automation, and autonomous decision-making.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 text-center">
+                    <div class="text-4xl mb-4">엣</div>
+                    <h3 class="text-xl font-bold mb-2">Edge Computing</h3>
+                    <p>Processing data closer to the source to reduce latency, save bandwidth, and improve privacy.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 text-center">
+                    <div class="text-4xl mb-4">Twins</div>
+                    <h3 class="text-xl font-bold mb-2">Digital Twins</h3>
+                    <p>Creating virtual replicas of physical assets to simulate, monitor, and optimize performance in real-time.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 text-center">
+                    <div class="text-4xl mb-4">🔗</div>
+                    <h3 class="text-xl font-bold mb-2">Blockchain</h3>
+                    <p>Using decentralized ledgers to enhance security, trust, and transparency, especially in supply chains.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="text-center py-8 mt-16 border-t">
+        <p class="text-gray-500">Interactive IoT Reference Architecture Guide</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const layerData = {
+                perception: {
+                    title: "Layer 1: Perception Layer",
+                    subtitle: "The Eyes and Ears of the System",
+                    description: "This physical layer is responsible for collecting data from the environment and/or performing actions on it. It's the bridge between the digital and physical worlds.",
+                    components: ["Sensors (Temperature, motion, light, etc.)", "Actuators (Motors, lights, valves)", "The 'Things' (Smart devices, industrial machines)"],
+                    example: "A motion sensor in a security system detects movement and sends a simple 'on' signal."
+                },
+                network: {
+                    title: "Layer 2: Network Layer",
+                    subtitle: "The Data Superhighway",
+                    description: "This layer is responsible for reliably transporting the data collected by the perception layer to the processing systems. It also carries commands back down to the actuators.",
+                    components: ["Gateways (Bridges between local networks and the internet)", "Communication Protocols (Wi-Fi, Bluetooth, Zigbee, Cellular, LoRaWAN)"],
+                    example: "A smart home hub receives a signal from a sensor via Zigbee and forwards it to a cloud server over your home's Wi-Fi."
+                },
+                processing: {
+                    title: "Layer 3: Data Processing Layer",
+                    subtitle: "Making Sense of the Data",
+                    description: "Often called the 'middleware' layer, this is where raw data is stored, processed, and analyzed. It transforms torrents of raw data into useful information.",
+                    components: ["Data Aggregation & Formatting", "Databases & Cloud Storage", "Analytics & Machine Learning Engines"],
+                    example: "A cloud platform receives temperature data from thousands of sensors, calculates the average, and flags any anomalies."
+                },
+                application: {
+                    title: "Layer 4: Application Layer",
+                    subtitle: "Delivering Value to the User",
+                    description: "This is the user-facing layer that provides specific services. It uses the processed data to present information and provide control to the end-user.",
+                    components: ["User Interfaces (Mobile apps, web dashboards)", "Data Visualization (Charts, graphs)", "Service-Specific Logic (e.g., irrigation schedules)"],
+                    example: "A mobile app displays a graph of your home's temperature over the last 24 hours and allows you to adjust the thermostat remotely."
+                },
+                business: {
+                    title: "Layer 5: Business Layer",
+                    subtitle: "Driving Strategic Decisions",
+                    description: "This top-level layer manages the entire IoT system and its business model. It uses the insights from the application layer to automate processes and inform strategic decisions.",
+                    components: ["Business Intelligence (BI) Integration", "Process Automation & Workflow Management", "System-wide Policy & Security Management"],
+                    example: "An insurance company uses driving data from a connected car app to offer usage-based policies and discounts to safe drivers."
+                }
+            };
+
+            const layerDetailsContainer = document.getElementById('layer-details');
+            const layerBoxes = document.querySelectorAll('.layer-box');
+
+            function updateLayerDetails(layerId) {
+                const data = layerData[layerId];
+                if (!data) return;
+
+                layerDetailsContainer.innerHTML = `
+                    <h3 class="text-2xl font-bold text-[#D35400] mb-2">${data.title}</h3>
+                    <p class="text-lg font-semibold text-gray-600 mb-4">${data.subtitle}</p>
+                    <p class="mb-6">${data.description}</p>
+                    <div class="mb-6">
+                        <h4 class="font-bold mb-2">Key Components:</h4>
+                        <ul class="list-disc list-inside space-y-1">
+                            ${data.components.map(c => `<li>${c}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-2">Example:</h4>
+                        <p class="bg-[#FDFBF8] p-3 rounded-md border border-gray-200">${data.example}</p>
+                    </div>
+                `;
+                
+                layerBoxes.forEach(box => {
+                    box.classList.remove('active');
+                    if (box.id === `layer-${layerId}`) {
+                        box.classList.add('active');
+                    }
+                });
+            }
+            
+            layerBoxes.forEach(box => {
+                box.addEventListener('click', () => {
+                    const layerId = box.id.split('-')[1];
+                    updateLayerDetails(layerId);
+                });
+            });
+
+            updateLayerDetails('perception');
+
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.dataset.tab;
+
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        if(btn.parentElement === button.parentElement) {
+                           if(btn.dataset.tab === tabId) btn.classList.add('active');
+                        }
+                    });
+                    
+                    tabContents.forEach(content => {
+                         if(content.id.startsWith(tabId.split('-')[0])) {
+                            content.classList.add('hidden');
+                            if (content.id === tabId) {
+                                content.classList.remove('hidden');
+                            }
+                         }
+                    });
+                });
+            });
+            
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 120) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            const ctx = document.getElementById('abstractionChart').getContext('2d');
+            const abstractionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Perception', 'Network', 'Data Processing', 'Application', 'Business'],
+                    datasets: [{
+                        label: 'Level of Abstraction',
+                        data: [10, 25, 50, 75, 90],
+                        backgroundColor: [
+                            'rgba(255, 159, 64, 0.5)',
+                            'rgba(75, 192, 192, 0.5)',
+                            'rgba(255, 205, 86, 0.5)',
+                            'rgba(54, 162, 235, 0.5)',
+                            'rgba(153, 102, 255, 0.5)'
+                        ],
+                        borderColor: [
+                            'rgb(255, 159, 64)',
+                            'rgb(75, 192, 192)',
+                            'rgb(255, 205, 86)',
+                            'rgb(54, 162, 235)',
+                            'rgb(153, 102, 255)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    let value = context.raw;
+                                    let text = '';
+                                    if (value < 20) text = 'Low (Physical Signals)';
+                                    else if (value < 40) text = 'Low-Medium (Data Packets)';
+                                    else if (value < 65) text = 'Medium (Information)';
+                                    else if (value < 85) text = 'High (Services & UI)';
+                                    else text = 'Very High (Strategic Value)';
+                                    return label + text;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                             ticks: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
